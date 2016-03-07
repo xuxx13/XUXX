@@ -1,0 +1,137 @@
+//
+//  main.cpp
+//  FirstFit
+//
+//  Created by yeguo on 16/3/7.
+//  Copyright (c) 2016ๅนด yeguo. All rights reserved.
+//
+
+#include <iostream>
+using namespace std;
+
+#define Maxproj 512
+struct block{
+    block* next = NULL;
+    int pos;
+    int size;
+};
+
+block *EmptyBlocks;
+block *OccupiedBlocks;
+
+void init(){
+    EmptyBlocks = new block;
+    EmptyBlocks->pos = 0;
+    EmptyBlocks->size = Maxproj;
+    
+    OccupiedBlocks = NULL;
+}
+
+bool applyMem(int size){
+    block *p = EmptyBlocks;
+    block *last = NULL;
+    while (p != NULL){
+        if (p->size >= size){
+            break;
+        }
+        last = p;
+        p = p->next;
+    }
+    if (p == NULL){
+        cout << "add error" << endl;;
+        return false;
+    }
+    block *newp = new block;
+    newp->size = size;
+    newp->pos = p->pos;
+    cout << "new @" << p->pos << ' ' << size << endl;
+    if (OccupiedBlocks == NULL){
+        OccupiedBlocks = newp;
+    }else{
+        block *tmp = OccupiedBlocks;
+        block *tmpLast = NULL;
+        while (tmp != NULL){
+            if (tmp->pos > newp->pos)
+                break;
+            tmpLast = tmp;
+            tmp = tmp->next;
+        }
+        tmpLast->next = newp;
+        newp->next = tmp;
+    }
+    
+    if (size < p->size){
+        newp = new block;
+        newp->pos = p->pos + size;
+        newp->size = p->size - size;
+        newp->next = p->next;
+        if (last != NULL)
+            last->next = newp;
+        else
+            EmptyBlocks = newp;
+    }else{
+        if (last != NULL)
+            last->next = p->next;
+        else
+            EmptyBlocks = newp;
+    }
+    delete  p;
+    return true;
+}
+
+bool releaseMem(int pos){
+    block *p = OccupiedBlocks;
+    block *last = NULL;
+    while (p != NULL){
+        if (p->pos == pos)
+            break;
+        last = p;
+        p = p->next;
+    }
+    if (p == NULL){
+        cout << "release error";
+        return  false;
+    }
+    if (last != NULL)
+        last -> next = p -> next;
+    cout << "release @" << p->pos << ' ' << p->size << endl;
+    block *tmp = EmptyBlocks;
+    block *tmpLast = NULL;
+    block *ll = NULL;
+    while (tmp != NULL){
+        if (tmp->pos > pos)
+            break;
+        ll = tmpLast;
+        tmpLast = tmp;
+        tmp = tmp->next;
+    }
+    if (p->pos + p->size == tmp->pos){
+        p->size += tmp->size;
+        p->next = tmp->next;
+        if (tmpLast != NULL)
+            tmpLast->next = p;
+        delete tmp;
+    }
+    
+    if (tmpLast->pos + tmpLast->size == p->pos){
+        p->size += tmpLast->size;
+        p->pos = tmpLast->pos;
+        ll->next = p;
+        delete tmpLast;
+    }
+    return true;
+}
+int main(int argc, const char * argv[]) {
+    init();
+    applyMem(10);
+    applyMem(20);
+    applyMem(10);
+    releaseMem(30);
+    return 0;
+}
+
+
+new @0 10
+new @10 20
+new @30 10
+release @30 10
