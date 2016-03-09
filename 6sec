@@ -1,0 +1,14 @@
+
+2   最小学号2013011419 第四组
+
+        virtual address 0x2c03
+        	--> pde index: 0xb	pde contents: (valid 1, pfn 0x44)
+        		--> pte index: 0x0	pde contents: (valid 1, pfn 0x57)
+        			-> Translates to Physical Address 0xae3 --> Value: 0x16
+        
+        virtual address 0x7fd7
+        	--> pde index: 0x1f	pde contents: (valid 1, pfn 0x12)
+        		--> pte index: 0x1e	pde contents: (valid 0, pfn 0x7f)
+        			—> Fault (page table entry not valid)
+        			
+ 
